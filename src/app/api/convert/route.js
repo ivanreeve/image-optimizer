@@ -24,8 +24,6 @@ const ACCEPTED_INPUT_MIME = new Set([
   'image/heif',
 ]);
 
-const MAX_FILE_BYTES = 25 * 1024 * 1024;
-
 function mimeFor(fmt) {
   return fmt === 'tiff' ? 'image/tiff' : `image/${fmt}`;
 }
@@ -51,7 +49,7 @@ export async function POST(req) {
   return await new Promise((resolve, reject) => {
     const bb = Busboy({
       headers: { 'content-type': contentType },
-      limits: { fileSize: MAX_FILE_BYTES, files: 1 },
+      limits: { files: 1 },
     });
 
     let responded = false;
@@ -78,7 +76,6 @@ export async function POST(req) {
         'content-disposition': `attachment; filename="${base}${outExt}"`,
       };
 
-      file.on('limit', () => reject(new Error(`File too large (max ${(MAX_FILE_BYTES / (1024 * 1024)).toFixed(0)} MB)`)));
       file.on('error', reject);
       s.on('error', reject);
 
